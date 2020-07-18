@@ -17,11 +17,8 @@ WIDTH = 700
 
 
 
-
 def Start_Extraction(username, password, server):
-
 	url = "http://"+server+"/reports/api/v2.0/reports"
-
 	r = requests.get(url, auth=HttpNtlmAuth(username, password))
 	response = session.get(url)
 	#print(r.status_code)
@@ -33,40 +30,42 @@ def Start_Extraction(username, password, server):
 	for value in rr['value']:
 		data =[ value['Name'], value['Id'] ]
 		d.append(data)
+	rdlexctract ='rdlexctract\\'
+	Query ='Query\\'
+	ParentDirectory = 'C:\\Users\\'+username+'\\Documents\\PySsrsExtractor\\'
+	PathQuery = os.path.join(ParentDirectory,Query)
+	Pathrdl = os.path.join(ParentDirectory,rdlexctract)
 
 	for name, ReportID in d:
 		uri ="http://"+server+"/Reports/api/v2.0/DataSets(" +ReportID + ")/Content/$value"
-	
 		rs = requests.get(uri, auth=HttpNtlmAuth(username, password))
 		response = session.get(uri)
-
-		with open('ssrsexctract\\'+name+'.rdl', 'wb') as file:
+		with open(Pathrdl  +name+'.rdl', 'wb') as file:
 			file.write(rs.content)
 			# print(f' {name} Report was downloaded')
 
 	sep = f"--+++++++++++++++++++++++++++++++++++++++++++++"
 
-	directory = 'C:\\Users\\'+username+'\\Documents\\Python Practice\\PySsrsExtractor\\ssrsexctract//'
-	query = 'C:\\Users\\'+username+'\\Documents\\Python Practice\\PySsrsExtractor\\ssrsexctract\\Query//'
+	
 
-	if not os.path.exists('directory'):
-		os.makedirs('directory')
-		print('Created Directory' + directory)
+	if not os.path.exists(PathQuery):
+		os.makedirs(PathQuery)
+		# print('Created Directory' + directory)
 
-	if not os.path.exists('query'):
-		os.makedirs('query')
-		print('Created Directory' + query)
+	if not os.path.exists(Pathrdl):
+		os.makedirs(Pathrdl)
+		# print('Created Directory' + query)
+
 
 	Reportpath =[]
-	for file in os.listdir(directory):
+	for file in os.listdir(Pathrdl):
 		filename = os.fsdecode(file)
 		if filename.endswith(".rdl"):
 			# print(os.path.join(directory, filename))
-			xml_data = os.path.join(directory, filename)
+			xml_data = os.path.join(Pathrdl, filename)
 			ReportName = filename.split('.')[0] 
-			file = open(f'{query}{ReportName}.sql' ,"w") 
-
-			xml_data = os.path.join(directory, filename)
+			file = open(f'{PathQuery}{ReportName}.sql' ,"w") 
+			# xml_data = os.path.join(PathQuery, filename)
 			# print(xml_data)
 			Reportpath.append(filename)
 			tree = ET.parse(xml_data)
@@ -76,7 +75,7 @@ def Start_Extraction(username, password, server):
 				d = ds.findall('{http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition}DataSet')
 				for q in d:
 					r = q.find('{http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition}Query')
-					labelList=[]
+					# labelList=[]
 					for querytext in r.findall('{http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition}CommandText'):
 						Sep = '{}-- {} --{} '.format( sep , filename ,sep)
 						# print(Sep + '\n' +querytext.text + '\n')
