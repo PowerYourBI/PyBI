@@ -21,10 +21,7 @@ def Start_Extraction(username, password, server):
 	url = "http://"+server+"/reports/api/v2.0/reports"
 	r = requests.get(url, auth=HttpNtlmAuth(username, password))
 	response = session.get(url)
-	#print(r.status_code)
 	rr = r.json()
-	# rr_str = json.dumps(rr, indent=2)
-	# print(rr_str)
 
 	d=[]
 	for value in rr['value']:
@@ -36,6 +33,13 @@ def Start_Extraction(username, password, server):
 	PathQuery = os.path.join(ParentDirectory,Query)
 	Pathrdl = os.path.join(ParentDirectory,rdlexctract)
 
+	if not os.path.exists(PathQuery):
+		os.makedirs(PathQuery)
+	# print('Created Directory' + directory)
+
+	if not os.path.exists(Pathrdl):
+		os.makedirs(Pathrdl)
+		# print('Created Directory' + query)
 	for name, ReportID in d:
 		uri ="http://"+server+"/Reports/api/v2.0/DataSets(" +ReportID + ")/Content/$value"
 		rs = requests.get(uri, auth=HttpNtlmAuth(username, password))
@@ -48,13 +52,7 @@ def Start_Extraction(username, password, server):
 
 	
 
-	if not os.path.exists(PathQuery):
-		os.makedirs(PathQuery)
-		# print('Created Directory' + directory)
 
-	if not os.path.exists(Pathrdl):
-		os.makedirs(Pathrdl)
-		# print('Created Directory' + query)
 
 
 	Reportpath =[]
